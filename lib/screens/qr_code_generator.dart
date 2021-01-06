@@ -15,17 +15,6 @@ class QRCodeGenerator extends StatefulWidget {
 class _QRCodeGeneratorState extends State<QRCodeGenerator> {
   String title = "Title";
   String url = "Example";
-  static const mimeType = "image/png";
-
-  void openInANewTab(url){
-    html.window.open(url, '$title');
-  }
-
-  void downloadFile(String url){
-    html.AnchorElement anchorElement =  new html.AnchorElement(href: url);
-    anchorElement.download = url;
-    anchorElement.click();
-  }
 
   Future<String> networkImageToBase64(String imageUrl) async {
     http.Response response = await http.get(imageUrl);
