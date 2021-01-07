@@ -6,6 +6,16 @@ import 'dart:convert';
 // ignore: avoid_web_libraries_in_flutter
 import 'dart:html' as html;
 import 'package:http/http.dart' as http;
+import 'package:flutter_material_pickers/flutter_material_pickers.dart';
+
+extension HexColor on Color {
+  /// Prefixes a hash sign if [leadingHashSign] is set to `true` (default is `true`).
+  String toHex({bool leadingHashSign = true}) => '${leadingHashSign ? '#' : ''}'
+      '${alpha.toRadixString(16).padLeft(2, '0')}'
+      '${red.toRadixString(16).padLeft(2, '0')}'
+      '${green.toRadixString(16).padLeft(2, '0')}'
+      '${blue.toRadixString(16).padLeft(2, '0')}';
+}
 
 class QRCodeGenerator extends StatefulWidget {
   @override
@@ -15,6 +25,20 @@ class QRCodeGenerator extends StatefulWidget {
 class _QRCodeGeneratorState extends State<QRCodeGenerator> {
   String title = "Title";
   String url = "Example";
+
+  var selectedFormat = "png";
+  var selectedSize = 500;
+  var color = Colors.black;
+  var selectedColor = (Colors.black).toHex().toString().replaceAll('#ff', '');
+
+  List<String> formats = <String>[
+    'png',
+    'jpg',
+    'jpeg',
+    'gif',
+    'svg',
+    'eps',
+  ];
 
   Future<String> networkImageToBase64(String imageUrl) async {
     http.Response response = await http.get(imageUrl);
@@ -97,35 +121,97 @@ class _QRCodeGeneratorState extends State<QRCodeGenerator> {
               decoration: BoxDecoration(
                   image: DecorationImage(
                       image: NetworkImage(
-                          'http://api.qrserver.com/v1/create-qr-code/?data=$url!&size=300x300'))),
+                          'http://api.qrserver.com/v1/create-qr-code/?data=$url&size=200x200&color=$selectedColor'))),
             ),
           ),
           Spacer(),
           Expanded(
             flex: 1,
-            child: Button(
-              onTap: () {
-                setState(() {
-                  title = title;
-                  url = url;
-                });
-              },
-              text: Text("Generate"),
+            child: Row(
+              children: [
+                Expanded(
+                  child: Button(
+                    text: Text("Format"),
+                    onTap: () {
+                      showMaterialRadioPicker(
+                        context: context,
+                        title: "Pick a format",
+                        headerColor: Colors.grey,
+                        items: formats,
+                        selectedItem: selectedFormat,
+                        onChanged: (value) => setState(() => selectedFormat = value),
+                      );
+                    },
+                  ),
+                ),
+                Expanded(
+                  child: Button(
+                    text: Text("Size"),
+                    onTap: () {
+                      showMaterialNumberPicker(
+                        context: context,
+                        title: "Pick a size (in px eq. 1000x1000)",
+                        headerColor: Colors.grey,
+                        maxNumber: selectedFormat != "eps" && selectedFormat != "svg" ? 1000 : 1000000,
+                        minNumber: selectedFormat != "eps" && selectedFormat != "svg" ? 100 : 1000,
+                        step: selectedFormat != "eps" && selectedFormat != "svg" ? 100 : 1000,
+                        selectedNumber: selectedSize,
+                        onChanged: (value) => setState(() => selectedSize = value),
+                      );
+                    },
+                  ),
+                ),
+                Expanded(
+                  child: Button(
+                    text: Text("Color"),
+                    onTap: () {
+                      showMaterialColorPicker(
+                        context: context,
+                        title: "Pick a color",
+                        headerColor: Colors.grey,
+                        selectedColor: color,
+                        onChanged: (value) => setState(() => color = value),
+                      );
+                    },
+                  ),
+                ),
+              ],
             ),
           ),
           Expanded(
             flex: 1,
-            child: Button(
-              onTap: () async {
-                //TODO: Pick a format and size
-                final imgBase64Str = await networkImageToBase64('http://api.qrserver.com/v1/create-qr-code/?data=$url!&size=500x500');
-                print(imgBase64Str);
-                html.AnchorElement(
-                    href: "data:application/octet-stream;charset=utf-16le;base64,$imgBase64Str")
-                  ..setAttribute("download", "$title.png")
-                  ..click();
-              },
-              text: Text("Save"),
+            child: Row(
+              children: [
+                Expanded(
+                  child: Button(
+                    onTap: () {
+                      setState(() {
+                        title = title;
+                        url = url;
+                        selectedSize = selectedSize;
+                        selectedFormat = selectedFormat;
+                        selectedColor = (color).toHex().toString().replaceAll('#ff', '');
+                      });
+                    },
+                    text: Text("Generate"),
+                  ),
+                ),
+                Expanded(
+                  child: Button(
+                    onTap: () async {
+                      final imgBase64Str = await networkImageToBase64(
+                          'http://api.qrserver.com/v1/create-qr-code/?data=$url&size=${selectedSize}x${selectedSize}&color=${selectedColor}&format=${selectedFormat}');
+                      print(imgBase64Str);
+                      html.AnchorElement(
+                          href:
+                              "data:application/octet-stream;charset=utf-16le;base64,$imgBase64Str")
+                        ..setAttribute("download", "$title.png")
+                        ..click();
+                    },
+                    text: Text("Save"),
+                  ),
+                ),
+              ],
             ),
           ),
         ],

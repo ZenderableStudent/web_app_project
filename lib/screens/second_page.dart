@@ -34,6 +34,7 @@ class _SecondPageState extends State<SecondPage> {
   ActivityLevel selectedLevel = ActivityLevel.level_0;
   WeightGoal selectedGoal = WeightGoal.keep;
   double endBMR;
+  // ignore: missing_return
   double finalBMR() {
     endBMR = 0;
     if (selectedLevel == ActivityLevel.level_0) {

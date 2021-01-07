@@ -24,7 +24,7 @@ class _WelcomePageState extends State<WelcomePage> {
                 childContainer: Expanded(
                   child: RawMaterialButton(
                     child:
-                        Text('BMR Calculator', style: kResultsTitleTextStyle),
+                        Center(child: Text('BMR Calculator', style: kResultsTitleTextStyle)),
                     onPressed: () {
                       Navigator.push(
                         context,
@@ -46,7 +46,7 @@ class _WelcomePageState extends State<WelcomePage> {
               childContainer: Expanded(
                 child: RawMaterialButton(
                   child:
-                      Text('QR Code Generator', style: kResultsTitleTextStyle),
+                      Center(child: Text('QR Code Generator', style: kResultsTitleTextStyle)),
                   onPressed: () {
                     Navigator.push(
                       context,
