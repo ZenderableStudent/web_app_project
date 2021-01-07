@@ -67,6 +67,7 @@ class _QRCodeGeneratorState extends State<QRCodeGenerator> {
           Expanded(
             flex: 2,
             child: BackgroundCard(
+              color: Colors.transparent,
               childContainer: TextField(
                 onChanged: (text) {
                   title = text;
@@ -95,6 +96,7 @@ class _QRCodeGeneratorState extends State<QRCodeGenerator> {
           Expanded(
             flex: 3,
             child: BackgroundCard(
+              color: Colors.transparent,
               childContainer: TextField(
                 autofocus: true,
                 onChanged: (text) {
@@ -184,6 +186,7 @@ class _QRCodeGeneratorState extends State<QRCodeGenerator> {
               children: [
                 Expanded(
                   child: Button(
+                    color: Colors.indigo,
                     onTap: () {
                       setState(() {
                         title = title;
@@ -198,14 +201,15 @@ class _QRCodeGeneratorState extends State<QRCodeGenerator> {
                 ),
                 Expanded(
                   child: Button(
+                    color: Colors.indigo,
                     onTap: () async {
                       final imgBase64Str = await networkImageToBase64(
-                          'http://api.qrserver.com/v1/create-qr-code/?data=$url&size=${selectedSize}x${selectedSize}&color=${selectedColor}&format=${selectedFormat}');
+                          'http://api.qrserver.com/v1/create-qr-code/?data=$url&size=${selectedSize}x$selectedSize&color=$selectedColor&format=$selectedFormat');
                       print(imgBase64Str);
                       html.AnchorElement(
                           href:
                               "data:application/octet-stream;charset=utf-16le;base64,$imgBase64Str")
-                        ..setAttribute("download", "$title.png")
+                        ..setAttribute("download", "$title.$selectedFormat")
                         ..click();
                     },
                     text: Text("Save"),
